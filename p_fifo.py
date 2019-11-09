@@ -1,3 +1,5 @@
+import time
+
 def readFile(filename):
     fileEntry = open(filename, "r")
     contents = fileEntry.read()
@@ -37,6 +39,7 @@ def makeList(workfile):
 def fifo(workList, q1, q2):
     resultList = []
     for q1 in range(q1, q2+1):
+        fifoTimeStart = time.time()
         index = 0
         incidence = False
         acertos = 0
@@ -73,11 +76,10 @@ def fifo(workList, q1, q2):
             incidence = False
             if index == q1:
                 index = 0
-
-        resultList.append([erros, acertos])
+                
+        fifoTimeElapsed = time.time() - fifoTimeStart
+        resultList.append([erros, acertos, fifoTimeElapsed])
     return resultList
-
-                    
 
 workFile = readFile("teste.txt")
 workList = makeList(workFile)
