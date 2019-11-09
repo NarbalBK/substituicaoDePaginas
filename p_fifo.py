@@ -1,4 +1,5 @@
 import time
+import matplotlib.pyplot as plt
 
 def readFile(filename):
     fileEntry = open(filename, "r")
@@ -81,8 +82,25 @@ def fifo(workList, q1, q2):
         resultList.append([erros, acertos, fifoTimeElapsed])
     return resultList
 
+def makePlot(results, q1, q2):
+    plotAcerto = []
+    plotFrame = []
+    i = 0
+    for q1 in range(q1, q2+1):
+        plotAcerto.append(int(results[i][1]))
+        plotFrame.append(q1)
+        i+=1
+    plt.plot(plotFrame, plotAcerto, marker='o')
+    plt.xlabel('numero de frames')
+    plt.ylabel('qtd de acertos')
+    plt.show()
+
+
+q1 = 5
+q2 = 11
 workFile = readFile("teste.txt")
 workList = makeList(workFile)
-
-print(fifo(workList, 5, 11))
+results = (fifo(workList, q1, q2))
+print(results)
+makePlot(results, q1, q2)
 
