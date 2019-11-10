@@ -12,4 +12,4 @@ def makeFile(filename, base, size):
     fileEntry.close
 
 
-makeFile('teste', 30, 8374)
+makeFile('teste', 7, 15)
