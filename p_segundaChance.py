@@ -109,7 +109,7 @@ def makePlot(results, q1, q2):
     plt.show()
 
 
-q1 = 5
+q1 = 3
 q2 = 11
 workFile = readFile("teste.txt")
 workList = makeList(workFile)
