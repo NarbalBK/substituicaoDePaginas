@@ -37,16 +37,18 @@ def makeList(workfile):
                 aux = aux + i
     return workList
 
-def secondChance(workList, q1, q2):
+def secondChance(workList, q1, q2, deltaT):
     resultList = []
     for q1 in range(q1, q2+1):
         fifoTimeStart = time.time()
+        deltaCache = deltaT
         index = 0
         incidence = False
         acertos = 0
         erros = 0
         frame = [-1] * q1
         waitList = []
+
         for instruction in workList:
             if (index<q1):
                 waiter = Waiter()
@@ -88,8 +90,13 @@ def secondChance(workList, q1, q2):
                                 break
                                     
             incidence = False
+            deltaT -= 1
             if index == q1:
                 index = 0
+            if deltaT == 0:
+                deltaT = deltaCache
+                for waiter in waitList:
+                    waiter.bitR = 0
                 
         fifoTimeElapsed = time.time() - fifoTimeStart
         resultList.append([erros, acertos, fifoTimeElapsed])
@@ -111,8 +118,9 @@ def makePlot(results, q1, q2):
 
 q1 = 3
 q2 = 11
+deltaT = 6
 workFile = readFile("teste.txt")
 workList = makeList(workFile)
-results = (secondChance(workList, q1, q2))
+results = (secondChance(workList, q1, q2, deltaT))
 print(results)
 makePlot(results, q1, q2)
