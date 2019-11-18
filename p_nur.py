@@ -41,7 +41,7 @@ def makeList(workfile):
 def nur(workList, q1, q2, deltaT):
     resultList = []
     for q1 in range(q1, q2+1):
-        fifoTimeStart = time.time()
+        nurTimeStart = time.time()
         deltaCache = deltaT
         index = 0
         incidence = False
@@ -114,8 +114,8 @@ def nur(workList, q1, q2, deltaT):
                 for waiter in waitList:
                     waiter.bitR = 0
                 
-        fifoTimeElapsed = time.time() - fifoTimeStart
-        resultList.append([erros, acertos, fifoTimeElapsed])
+        nurTimeElapsed = time.time() - nurTimeStart
+        resultList.append([erros, acertos, nurTimeElapsed])
     return resultList
 
 def makePlot(results, q1, q2):
