@@ -116,9 +116,9 @@ def makePlot(results, q1, q2):
     plt.show()
 
 
-q1 = 3
-q2 = 11
-deltaT = 6
+q1 = 5
+q2 = 5
+deltaT = 10
 workFile = readFile("teste.txt")
 workList = makeList(workFile)
 results = (secondChance(workList, q1, q2, deltaT))
