@@ -179,6 +179,8 @@ def nur(workList, q1, q2, deltaT, nurResults):
                         for j in range(q1):
                             if (waitList[j].frameIndex == i):
                                 waitList[j].bitR = 1
+                                if (waitList[j].bitM == 1):
+                                    break
                                 waitList[j].bitM = instruction.pageMode
                                 break
                         break
@@ -198,7 +200,7 @@ def nur(workList, q1, q2, deltaT, nurResults):
                         min = None
                         idxMin = None
                         for i in range(q1):
-                            classe = waitList[i].bitR + waitList[i].bitM*2
+                            classe = waitList[i].bitR*2 + waitList[i].bitM
                             if (classe == 0):
                                 idxMin = i
                                 break 
