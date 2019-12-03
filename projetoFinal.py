@@ -9,6 +9,8 @@ nurResults = []
 murResults = []
 otimoResults = []
 
+results = []
+
 def readFile(filename):
     try:
         fileEntry = open(filename, "r")
@@ -288,9 +290,26 @@ def mur(workList, q1, q2, murResults):
         murResults.append([erros, acertos, murTimeElapsed])
     return
 
+def makePlot(results, q1, q2):
+    plt.figure()
+    aux = q1
+    for list in results:
+        plotAcerto = []
+        plotFrame = []
+        i = 0
+        q1 = aux
+        for q1 in range(q1, q2+1):
+            plotAcerto.append(int(list[i][1]))
+            plotFrame.append(q1)
+            i+=1
+        plt.plot(plotFrame, plotAcerto, marker='o')
+    plt.xlabel('numero de frames')
+    plt.ylabel('qtd de acertos')
+    plt.show()
+
 print("Projeto II de Sistemas Operacionais")
 print("Algoritmo de Substituição de Páginas\n")
-print("Por: Ávaro Alves e Péricles Narbal\n")
+print("Por: Álvaro Alves e Péricles Narbal\n")
 print("Entradas do Sistema:\n")
 filename = input("Entre com o nome do arquivo: ")
 q1 = int(input("Defina a qunatidade INICIAL de frames: "))
@@ -301,22 +320,29 @@ workFile = readFile(filename)
 workList = makeList(workFile)
 
 fifoThr = threading.Thread(target=fifo,args=(workList, q1, q2, fifoResults))
-fifoThr.start()
 secondChanceThr = threading.Thread(target=secondChance,args=(workList, q1, q2, deltaT, secondChanceResults))
-secondChanceThr.start()
 nurThr = threading.Thread(target=nur,args=(workList, q1, q2, deltaT, nurResults))
-nurThr.start()
 mruThr = threading.Thread(target=mur,args=(workList, q1, q2, murResults))
+
+fifoThr.start()
+secondChanceThr.start()
+nurThr.start()
 mruThr.start()
 
 fifoThr.join()
+results.append(fifoResults)
 print(fifoResults)
 
 secondChanceThr.join()
+results.append(secondChanceResults)
 print(secondChanceResults)
 
 nurThr.join()
+results.append(nurResults)
 print(nurResults)
 
 mruThr.join()
+results.append(murResults)
 print(murResults)
+
+makePlot(results, q1, q2)
