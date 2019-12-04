@@ -27,6 +27,7 @@ class Instruction:
 class Waiter:
     pageNumber = None
     frameIndex = None
+    litIndex = None
     bitR = None
 
 def makeList(workfile):
@@ -292,6 +293,71 @@ def mur(workList, q1, q2, murResults):
         murResults.append([erros, acertos, murTimeElapsed])
     return
 
+def otimo(workList, q1, q2, otimoResults):
+    for q1 in range(q1, q2+1):
+        otimoTimeStart = time.time()
+        index = 0
+        incidence = False
+        acertos = 0
+        erros = 0
+        frame = [-1] * q1
+        waitList = []
+        tamWorkList = len(workList)
+        
+        for inst in range(tamWorkList):
+            instruction = workList[0]
+            workList.pop(0)
+            if (index<q1):
+                for i in range(q1):
+                    if (instruction.pageNumber == frame[i]):
+                        acertos += 1
+                        incidence = True
+                        break
+                
+                if (not incidence):
+                    waiter = Waiter()
+                    if (frame[index] == -1):
+                        frame[index] = instruction.pageNumber
+                        waiter.pageNumber = instruction.pageNumber
+                        waiter.frameIndex = index
+                        waitList.append(waiter)
+                        erros += 1
+                        index += 1
+                        
+                    else:
+                        indexList = []
+                        max = len(workList)
+                        for w in waitList:
+                            for k in range(max):
+                                if (w.pageNumber == workList[k].pageNumber):
+                                    w.litIndex = k
+                                    indexList.append(w)
+                                    break
+                            if w.litIndex == None:
+                                w.litIndex = 1 * 10**6
+                                indexList.append(w)
+                        
+                        sortIndex = sorted(indexList, key=lambda x: x.litIndex, reverse=True)
+
+                        frame[sortIndex[0].frameIndex] = instruction.pageNumber
+                        waiter.pageNumber = instruction.pageNumber
+                        for i in range(q1):
+                            if (sortIndex[0].pageNumber == waitList[i].pageNumber):
+                                waiter.frameIndex = waitList[i].frameIndex
+                                waitList.pop(i)
+                                break
+                        waitList.append(waiter)
+                        erros += 1
+                        index += 1
+
+            incidence = False
+            if index == q1:
+                index = 0
+                
+        otimoTimeElapsed = time.time() - otimoTimeStart
+        otimoResults.append([erros, acertos, otimoTimeElapsed])
+    return 
+
 def makePlot(results, q1, q2):
     plt.figure()
     aux = q1
@@ -320,16 +386,19 @@ deltaT = int(input("Defina a zerésima do Bit R: "))
 
 workFile = readFile(filename)
 workList = makeList(workFile)
+newList = workList[:]
 
 fifoThr = threading.Thread(target=fifo,args=(workList, q1, q2, fifoResults))
 secondChanceThr = threading.Thread(target=secondChance,args=(workList, q1, q2, deltaT, secondChanceResults))
 nurThr = threading.Thread(target=nur,args=(workList, q1, q2, deltaT, nurResults))
 mruThr = threading.Thread(target=mur,args=(workList, q1, q2, murResults))
+otimoThr = threading.Thread(target=otimo,args=(newList, q1, q2, otimoResults))
 
 fifoThr.start()
 secondChanceThr.start()
 nurThr.start()
 mruThr.start()
+otimoThr.start()
 
 fifoThr.join()
 results.append(fifoResults)
@@ -346,5 +415,9 @@ print(nurResults)
 mruThr.join()
 results.append(murResults)
 print(murResults)
+
+otimoThr.join()
+results.append(otimoResults)
+print(otimoResults)
 
 makePlot(results, q1, q2)
