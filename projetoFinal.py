@@ -2,6 +2,7 @@
 import time
 import matplotlib.pyplot as plt
 import threading
+import plotly.graph_objects as go
 
 fifoResults = []
 secondChanceResults = []
@@ -303,10 +304,10 @@ def otimo(workList, q1, q2, otimoResults):
         frame = [-1] * q1
         waitList = []
         tamWorkList = len(workList)
-        
+        newList = workList[:]
         for inst in range(tamWorkList):
-            instruction = workList[0]
-            workList.pop(0)
+            instruction = newList[0]
+            newList.pop(0)
             if (index<q1):
                 for i in range(q1):
                     if (instruction.pageNumber == frame[i]):
@@ -326,10 +327,10 @@ def otimo(workList, q1, q2, otimoResults):
                         
                     else:
                         indexList = []
-                        max = len(workList)
+                        max = len(newList)
                         for w in waitList:
                             for k in range(max):
-                                if (w.pageNumber == workList[k].pageNumber):
+                                if (w.pageNumber == newList[k].pageNumber):
                                     w.litIndex = k
                                     indexList.append(w)
                                     break
@@ -361,6 +362,9 @@ def otimo(workList, q1, q2, otimoResults):
 def makePlot(results, q1, q2):
     plt.figure()
     aux = q1
+    dictValues = []
+    labels = ["Fifo", "SC", "Nur", "Mru","Ótimo"]
+    lblCt = 0
     for list in results:
         plotAcerto = []
         plotFrame = []
@@ -370,10 +374,20 @@ def makePlot(results, q1, q2):
             plotAcerto.append(int(list[i][1]))
             plotFrame.append(q1)
             i+=1
-        plt.plot(plotFrame, plotAcerto, marker='o')
+        plt.plot(plotFrame, plotAcerto,'-',marker='*',label=labels[lblCt])
+        dictValues.append(plotAcerto)
+        lblCt+=1
+    dictValues.insert(0, plotFrame)
     plt.xlabel('numero de frames')
     plt.ylabel('qtd de acertos')
+    plt.grid(True)
+    plt.legend(loc=4)
     plt.show()
+
+    fig = go.Figure(data=[go.Table(header=dict(values=['Qtd de Frames', 'Fifo', 'SC', 'Nur', 'Mru', 'Ótimo']),
+                 cells=dict(values=dictValues))
+                     ])
+    fig.show()
 
 print("Projeto II de Sistemas Operacionais")
 print("Algoritmo de Substituição de Páginas\n")
@@ -386,13 +400,12 @@ deltaT = int(input("Defina a zerésima do Bit R: "))
 
 workFile = readFile(filename)
 workList = makeList(workFile)
-newList = workList[:]
 
 fifoThr = threading.Thread(target=fifo,args=(workList, q1, q2, fifoResults))
 secondChanceThr = threading.Thread(target=secondChance,args=(workList, q1, q2, deltaT, secondChanceResults))
 nurThr = threading.Thread(target=nur,args=(workList, q1, q2, deltaT, nurResults))
 mruThr = threading.Thread(target=mur,args=(workList, q1, q2, murResults))
-otimoThr = threading.Thread(target=otimo,args=(newList, q1, q2, otimoResults))
+otimoThr = threading.Thread(target=otimo,args=(workList, q1, q2, otimoResults))
 
 fifoThr.start()
 secondChanceThr.start()

@@ -1,5 +1,6 @@
 import time
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 
 def readFile(filename):
     fileEntry = open(filename, "r")
@@ -111,6 +112,7 @@ def otimo(workList, q1, q2):
 def makePlot(results, q1, q2):
     plotAcerto = []
     plotFrame = []
+    dictValues = []
     i = 0
     for q1 in range(q1, q2+1):
         plotAcerto.append(int(results[i][1]))
@@ -121,9 +123,14 @@ def makePlot(results, q1, q2):
     plt.ylabel('qtd de acertos')
     plt.show()
 
+    fig = go.Figure(data=[go.Table(header=dict(values=['Qtd de Frames', 'Fifo', 'SC', 'Nur', 'Mru', 'Ótimo']),
+                 cells=dict(values=[[100, 90, 80, 90], [95, 85, 75, 95]]))
+                     ])
+    fig.show()
 
-q1 = 70
-q2 = 70
+
+q1 = 3
+q2 = 3
 workFile = readFile("teste.txt")
 workList = makeList(workFile)
 results = (otimo(workList, q1, q2))
